@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/image.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/generate-image", "dest": "api/image.py" },
+    { "src": "/", "dest": "api/image.py" }
+  ]
+}
