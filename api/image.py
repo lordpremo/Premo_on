@@ -1,5 +1,4 @@
 import os
-import base64
 import httpx
 from fastapi import FastAPI, Form
 from fastapi.responses import JSONResponse
@@ -51,9 +50,10 @@ async def generate_image(prompt: str = Form(...)):
         "Accept": "application/json"
     }
 
-    form_data = {
-        "prompt": prompt,
-        "output_format": "png"
+    # HAPA NDIO FIX YA KWELI
+    files = {
+        "prompt": (None, prompt),
+        "output_format": (None, "png")
     }
 
     try:
@@ -61,7 +61,7 @@ async def generate_image(prompt: str = Form(...)):
             r = await client.post(
                 STABILITY_API_URL,
                 headers=headers,
-                data=form_data
+                files=files
             )
 
         if r.status_code != 200:
@@ -75,9 +75,8 @@ async def generate_image(prompt: str = Form(...)):
             )
 
         data = r.json()
-        # Stability hurudisha base64 image kwenye "image" au "images"
-        image_base64 = None
 
+        image_base64 = None
         if "image" in data:
             image_base64 = data["image"]
         elif "images" in data and len(data["images"]) > 0:
@@ -98,4 +97,4 @@ async def generate_image(prompt: str = Form(...)):
         return JSONResponse(
             {"error": f"Hitilafu wakati wa kuwasiliana na Stability API: {str(e)}"},
             status_code=500
-)
+        )
